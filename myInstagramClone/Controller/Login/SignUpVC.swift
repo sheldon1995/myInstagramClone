@@ -22,83 +22,43 @@ class SignUpVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     }()
     
     let emailTextFiled : UITextField = {
-        let tf = UITextField()
-        tf.placeholder = "Email"
-        // Alpha: The opacity value of the color object, specified as a value from 0.0 to 1.0.
-        tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
-        // Displays a rounded-style border for the text field.
-        tf.borderStyle = .roundedRect
-        tf.font = UIFont.systemFont(ofSize: 14)
+        let tf = UITextField().getTextField(placeholder: "Email",isSecureTextEntry:false)
         // Every time, the editing is changed in the email text field, it's gonna call formValidation to make sure our for form is valid
+        
         tf.addTarget(self, action: #selector(formValidation), for: .editingChanged)
         return tf
     }()
     
     let passwordTextFiled : UITextField = {
-        let tf = UITextField()
-        tf.placeholder = "Password"
-        // Alpha: The opacity value of the color object, specified as a value from 0.0 to 1.0.
-        tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
-        // Displays a rounded-style border for the text field.
-        tf.borderStyle = .roundedRect
-        tf.font = UIFont.systemFont(ofSize: 14)
-        // Using secure text entry
-        tf.isSecureTextEntry = true
-        // Every time, the editing is changed in the email text field, it's gonna call formValidation to make sure our for form is valid
+        let tf = UITextField().getTextField(placeholder: "Password",isSecureTextEntry:true)
         tf.addTarget(self, action: #selector(formValidation), for: .editingChanged)
         return tf
     }()
     
     let fullNameTextFiled : UITextField = {
-        let tf = UITextField()
-        tf.placeholder = "Full name"
-        // Alpha: The opacity value of the color object, specified as a value from 0.0 to 1.0.
-        tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
-        // Displays a rounded-style border for the text field.
-        tf.borderStyle = .roundedRect
-        tf.font = UIFont.systemFont(ofSize: 14)
-        
+        let tf = UITextField().getTextField(placeholder: "Full name",isSecureTextEntry:false)
         tf.addTarget(self, action: #selector(formValidation), for: .editingChanged)
         return tf
     }()
     
     let userNameTextFiled : UITextField = {
-        let tf = UITextField()
-        tf.placeholder = "Username"
-        // Alpha: The opacity value of the color object, specified as a value from 0.0 to 1.0.
-        tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
-        // Displays a rounded-style border for the text field.
-        tf.borderStyle = .roundedRect
-        tf.font = UIFont.systemFont(ofSize: 14)
+        let tf = UITextField().getTextField(placeholder: "Username",isSecureTextEntry:false)
         tf.addTarget(self, action: #selector(formValidation), for: .editingChanged)
         return tf
     }()
     
     let signUpButton:UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Sign Up", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .mainBlue
-        // Round the button
-        button.layer.cornerRadius = 5
-        // Add target to sign up button
+        let button = UIButton().authButton(title: "Sign Up")
         button.addTarget(self, action: #selector(handleSignUp), for: .touchUpInside)
-        // The button is not processable until all information are gaven.
-        button.isEnabled = false
-        button.backgroundColor = UIColor(red: 149/255, green: 204/255, blue: 244/255, alpha: 1)
         return button
     }()
+    
     let allreadyHaveAccountButton:UIButton = {
-        let button = UIButton(type: .system)
-        // A mutable string object that also contains attributes
-        let attributeTitle = NSMutableAttributedString(string: "Already have an account?   ", attributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14),NSAttributedString.Key.foregroundColor:UIColor.lightGray])
-        attributeTitle.append(NSAttributedString(string: "Sign In", attributes:[NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14),NSAttributedString.Key.foregroundColor:UIColor.mainBlue]))
-        button.setAttributedTitle(attributeTitle, for: .normal)
-        
-        // Add target/action to button, when it is clicked, the function "handleShowSignUp" gets called
+        let button = UIButton().haveOrNotAccountButton(string1: "Already have an account?   ", string2: "Sign In")
         button.addTarget(self, action: #selector(backToLoginPage), for: .touchUpInside)
         return button
     }()
+    
     func configurViewComponents(){
         let stackView = UIStackView(arrangedSubviews: [emailTextFiled,fullNameTextFiled,userNameTextFiled,passwordTextFiled,signUpButton])
         stackView.axis = .vertical
@@ -169,7 +129,7 @@ class SignUpVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
                     // save user info to database
                     //  The reference tree shown on the website
                     Database.database().reference().child("users").updateChildValues(values, withCompletionBlock: { (error, ref) in
-
+                        
                         guard let mainTabVC = keyWindow?.rootViewController as? MainPageViewController else {return}
                         
                         // Configure view controller
@@ -177,7 +137,7 @@ class SignUpVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
                         
                         // Dismiss login controller
                         self.dismiss(animated: true, completion: nil)
-
+                        
                     })
                 })
             })
@@ -224,7 +184,7 @@ class SignUpVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         // Yes, the user indeed select one image
         imageSelected = true
         signUpButton.isEnabled = true
-        signUpButton.backgroundColor = UIColor(red: 17/255, green: 154/255, blue: 237/255, alpha: 1)
+        signUpButton.backgroundColor = .enableColor
         // Confugure addPhotot button with selected image
         // Nice circular
         addPhotoButton.layer.cornerRadius = addPhotoButton.frame.width / 2

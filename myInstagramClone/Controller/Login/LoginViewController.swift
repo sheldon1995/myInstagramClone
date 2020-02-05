@@ -24,57 +24,28 @@ class LoginViewController: UIViewController {
         return view
     }()
     let emailTextFiled : UITextField = {
-        let tf = UITextField()
-        tf.placeholder = "Email"
-        // Alpha: The opacity value of the color object, specified as a value from 0.0 to 1.0.
-        tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
-        // Displays a rounded-style border for the text field.
-        tf.borderStyle = .roundedRect
-        tf.font = UIFont.systemFont(ofSize: 14)
+        let tf = UITextField().getTextField(placeholder: "Email",isSecureTextEntry:false)
         
         tf.addTarget(self, action: #selector(formValidation), for: .editingChanged)
         return tf
     }()
     
     let passwordTextFiled : UITextField = {
-        let tf = UITextField()
-        tf.placeholder = "Password"
-        // Alpha: The opacity value of the color object, specified as a value from 0.0 to 1.0.
-        tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
-        // Displays a rounded-style border for the text field.
-        tf.borderStyle = .roundedRect
-        tf.font = UIFont.systemFont(ofSize: 14)
-        // Identifies whether the text object should disable text copying and in some cases hide the text being entered.
-        tf.isSecureTextEntry = true
+        let tf = UITextField().getTextField(placeholder: "Password",isSecureTextEntry:true)
         tf.addTarget(self, action: #selector(formValidation), for: .editingChanged)
         return tf
     }()
     
     let loginButton:UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Login", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .mainBlue
-        // Round the button
-        button.layer.cornerRadius = 5
-        
+        let button = UIButton().authButton(title: "Login In")
         button.addTarget(self, action: #selector(handleLogIn), for: .touchUpInside)
-        
-        // The button is not processable until all information are gaven.
-        button.isEnabled = false
-        button.backgroundColor = .disableColor
         return button
     }()
     
     let noAccountButton:UIButton = {
-        let button = UIButton(type: .system)
-        // A mutable string object that also contains attributes
-        let attributeTitle = NSMutableAttributedString(string: "Don't have an account?   ", attributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14),NSAttributedString.Key.foregroundColor:UIColor.lightGray])
-        attributeTitle.append(NSAttributedString(string: "Sign Up", attributes:[NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14),NSAttributedString.Key.foregroundColor:UIColor.mainBlue]))
-        button.setAttributedTitle(attributeTitle, for: .normal)
-        
-        // Add target/action to button, when it is clicked, the function "handleShowSignUp" gets called
+        let button = UIButton().haveOrNotAccountButton(string1: "Don't have an account?   ", string2: "Sign Up")
         button.addTarget(self, action: #selector(handleShowSignUp), for: .touchUpInside)
+
         return button
     }()
     
@@ -94,7 +65,7 @@ class LoginViewController: UIViewController {
             // Handle error
             if let error = error{
                 print("Unable to sign in with error, ",error.localizedDescription)
-                 return
+                return
             }
             // Sign in with this email, password, navigate to main page.
             print("Successfully signed user in!")
@@ -134,7 +105,7 @@ class LoginViewController: UIViewController {
         
         // Hide navigation bar
         navigationController?.navigationBar.isHidden = true
-                
+        
         view.backgroundColor = .white
         view.addSubview(logoContainerView)
         

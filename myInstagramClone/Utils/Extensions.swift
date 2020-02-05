@@ -222,5 +222,42 @@ extension Date{
 }
 
 
+extension UITextField{
+    func getTextField(placeholder:String, isSecureTextEntry:Bool) -> UITextField{
+        let tf = UITextField()
+        tf.placeholder = placeholder
+        // Alpha: The opacity value of the color object, specified as a value from 0.0 to 1.0.
+        tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
+        // Displays a rounded-style border for the text field.
+        tf.borderStyle = .roundedRect
+        tf.font = UIFont.systemFont(ofSize: 14)
+        tf.isSecureTextEntry = isSecureTextEntry
+        return tf
+        
+    }
+}
 
+extension UIButton{
+    func authButton(title:String) ->UIButton{
+        let button = UIButton(type: .system)
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .mainBlue
+        // Round the button
+        button.layer.cornerRadius = 5
+        // The button is not processable until all information are gaven.
+        button.isEnabled = false
+        button.backgroundColor = .disableColor
+        return button
+    }
+    
+    func haveOrNotAccountButton(string1:String,string2:String)-> UIButton{
+        let button = UIButton(type: .system)
+        // A mutable string object that also contains attributes
+        let attributeTitle = NSMutableAttributedString(string: string1, attributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14),NSAttributedString.Key.foregroundColor:UIColor.lightGray])
+        attributeTitle.append(NSAttributedString(string: string2, attributes:[NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14),NSAttributedString.Key.foregroundColor:UIColor.mainBlue]))
+        button.setAttributedTitle(attributeTitle, for: .normal)
+        return button
+    }
+}
 
