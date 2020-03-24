@@ -7,8 +7,9 @@
 //
 import Foundation
 import Firebase
-class Post{
-    
+class Post
+{
+ 
     // MARK: Properties
     var caption:String!
     var likes:Int!

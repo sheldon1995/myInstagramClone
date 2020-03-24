@@ -50,6 +50,10 @@ class ProfileVC: UICollectionViewController, UICollectionViewDelegateFlowLayout,
         fetchPosts()
         
         CONSTANTS_ProfileVC = self
+        
+        collectionView.dragDelegate = self
+        collectionView.dragInteractionEnabled = true
+        collectionView.dropDelegate = self
     }
     // MARK: UICollectionViewFlowLayout
     
@@ -154,7 +158,7 @@ class ProfileVC: UICollectionViewController, UICollectionViewDelegateFlowLayout,
     
     // Fetch posts
     func fetchPosts(){
- 
+        
         // The other user get into the user profile page by searching, show this use's post.
         var uid : String!
         if let user = self.user{
@@ -170,7 +174,7 @@ class ProfileVC: UICollectionViewController, UICollectionViewDelegateFlowLayout,
             USER_POSTS_REF.child(uid).queryLimited(toLast: 9).observeSingleEvent(of: .value) { (snapshot) in
                 // Stop refresh
                 self.collectionView.refreshControl?.endRefreshing()
-        
+                
                 
                 guard let first = snapshot.children.allObjects.first as? DataSnapshot else {return}
                 guard let allObjects = snapshot.children.allObjects as? [DataSnapshot] else {return}
@@ -245,14 +249,14 @@ class ProfileVC: UICollectionViewController, UICollectionViewDelegateFlowLayout,
         if header.editProfileFollowButton.titleLabel?.text == "Edit Profile"{
             // Jump to editprofile VC
             let editProfileVC = EditProfileVC()
-           
+            
             editProfileVC.user = user
             editProfileVC.profileVC = self
             
             let navigationController = UINavigationController(rootViewController: editProfileVC)
             navigationController.modalPresentationStyle = .fullScreen
             present(navigationController,animated: true, completion: nil)
-//            navigationController?.pushViewController(editProfileVC, animated: true)
+            //            navigationController?.pushViewController(editProfileVC, animated: true)
         }
             // Unfollow
         else if header.editProfileFollowButton.titleLabel?.text == "Following"{
@@ -319,6 +323,8 @@ class ProfileVC: UICollectionViewController, UICollectionViewDelegateFlowLayout,
             header.postLabel.attributedText = attributeText
         }
     }
+    
+    // Handler Following Tapped
     func handleFollowingsTapped(for header: UserProfileHeader) {
         let followVC = FollowLikeVC()
         followVC.viewMode = FollowLikeVC.viewMode(index: 0)
@@ -326,6 +332,7 @@ class ProfileVC: UICollectionViewController, UICollectionViewDelegateFlowLayout,
         navigationController?.pushViewController(followVC, animated: true)
     }
     
+    // Handle Follower Tapped
     func handleFollowersTapped(for header: UserProfileHeader) {
         let followVC = FollowLikeVC()
         
@@ -333,4 +340,71 @@ class ProfileVC: UICollectionViewController, UICollectionViewDelegateFlowLayout,
         followVC.uid = user?.uid
         navigationController?.pushViewController(followVC, animated: true)
     }
+    
+    // Reorder Our Posts
+    func reorderPosts(coordinator: UICollectionViewDropCoordinator, destinationIndexPath : IndexPath, collectionView:UICollectionView){
+        // Animates multiple insert, delete, reload, and move operations as a group.
+        // The first item is the one we drag.
+        if let post = coordinator.items.first,let sourceIndexPath = post.sourceIndexPath {
+            collectionView.performBatchUpdates({
+                // Remove the item
+                self.posts.remove(at: sourceIndexPath.item )
+                // Insert the item
+                self.posts.insert(post.dragItem.localObject as! Post, at: destinationIndexPath.item)
+                
+                collectionView.deleteItems(at: [sourceIndexPath])
+                collectionView.insertItems(at: [destinationIndexPath])
+            }, completion: nil)
+            // Animates the item to the specified index path in the collection view.
+            coordinator.drop(post.dragItem, toItemAt: destinationIndexPath)
+        }
+        
+        
+    }
+}
+
+// Drag and Drop
+
+extension ProfileVC: UICollectionViewDropDelegate{
+    
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        if collectionView.hasActiveDrag{
+            return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+        }else{
+            return UICollectionViewDropProposal(operation: .forbidden)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        var destinationIndexPath : IndexPath
+        if let indexPath = coordinator.destinationIndexPath{
+            destinationIndexPath = indexPath
+        }
+        else{
+            let section = collectionView.numberOfSections - 1
+            let row = collectionView.numberOfItems(inSection: section) - 1
+            destinationIndexPath = IndexPath(item: row, section: section)
+            
+        }
+        
+        if coordinator.proposal.operation == .move{
+            reorderPosts(coordinator: coordinator, destinationIndexPath: destinationIndexPath, collectionView: collectionView)
+        }
+        
+    }
+    
+    
+    
+}
+extension ProfileVC: UICollectionViewDragDelegate{
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let post = self.posts[indexPath.row]
+        let itemProvider = NSItemProvider(object: post.caption as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        dragItem.localObject = post
+        return [dragItem]
+        
+    }
+    
+    
 }

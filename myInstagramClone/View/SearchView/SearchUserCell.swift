@@ -25,6 +25,7 @@ class SearchUserCell: UITableViewCell {
             
         }
     }
+    
     let profileImageView: CustomImageView = {
         
         let iv = CustomImageView()

@@ -59,7 +59,7 @@ class SignUpVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         return button
     }()
     
-    func configurViewComponents(){
+    func    configurViewComponents(){
         let stackView = UIStackView(arrangedSubviews: [emailTextFiled,fullNameTextFiled,userNameTextFiled,passwordTextFiled,signUpButton])
         stackView.axis = .vertical
         stackView.spacing = 10
